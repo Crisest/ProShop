@@ -32,7 +32,8 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     const userExist = await User.findOne({ email })
     if(userExist){
-        res.status(400).send('User already exists')
+        res.status(400)
+        throw new Error('User already exists')
     }
     const user = await User.create({name, email, password})
 
@@ -64,9 +65,33 @@ export const getUserProfile = asyncHandler(async (req, res) => {
             isAdmin: user.isAdmin
         })
     }
+})
 
-    // const user = await User.findById( req.user._id )
-    res.send('Success')
+// @desc Update user profile
+// @route PUT /api/users/profile
+// @access Private
+export const updateUserProfile = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id)
+    if(!user){
+        res.status(404).send()
+        throw new Error('User not found')
+    } else {
+        user.name = req.body.name || user.name
+        user.email = req.body.email || user.email
+        if(req.body.password){
+            user.password =  req.body.password
+        }
+
+        const updatedUser = await user.save()
+        res.json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            isAdmin: updatedUser.isAdmin,
+            token: generateToken(updatedUser._id)
+        })
+        
+    }
 })
 
 
