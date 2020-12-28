@@ -12,8 +12,7 @@ const PlaceOrderScreen = ({ history }) => {
 
     const cart = useSelector(state => state.cart)
 
-    //calculate prices
-
+    // Calculate prices
     const addDecimals = (num) => {
         return (Math.round(num * 100) / 100).toFixed(2)
     }
@@ -30,13 +29,12 @@ const PlaceOrderScreen = ({ history }) => {
     useEffect(() => {
         if(success){
             history.push(`/order/${order._id}`)
-            console.log(success)
+            console.log("works")
         }
         // eslint-disable-next-line
     }, [history, success])
 
     const placeOrderHandler = () => {
-        console.log("push the button")
         dispatch(createOrder({
             orderItems: cart.cartItems,
             shippingAddress: cart.shippingAddress,
