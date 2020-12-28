@@ -12,7 +12,7 @@ export const protect = AsyncHandler(async (req, res, next) => {
             req.user = await User.findById(decoded.id).select('-password')
             next()
         } catch (error) {
-            congole.error(error)
+            console.error(error)
             res.status(401)
             throw new Error('Not Authorized, token failed')
         }
