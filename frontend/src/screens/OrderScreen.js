@@ -19,6 +19,7 @@ const OrderScreen = ({ match }) => {
 
     const orderDetails = useSelector(state => state.orderDetails)
     const { order, loading, error } = orderDetails
+    // console.log(order.totalPrice)
 
     const orderPay = useSelector(state => state.orderPay)
     const { loading: loadingPay, sucess: successPay } = orderPay
@@ -47,11 +48,13 @@ const OrderScreen = ({ match }) => {
             document.body.appendChild(script)
         }
 
-        if(!order  || successPay){
-            dispatch({ type: ORDER_PAY_RESET })
-            if(!order || order._id !== orderId) { 
-                dispatch(getOrderDetails(orderId))
-            }
+        
+            
+        if(!order || order._id !== orderId || successPay) {
+            
+            dispatch({ type: ORDER_PAY_RESET }) 
+            dispatch(getOrderDetails(orderId))     
+
         } else if(!order.isPaid){
             if(!window.paypal) {
                 addPayPalScript()
@@ -172,7 +175,20 @@ const OrderScreen = ({ match }) => {
                                 <ListGroup.Item>
                                     {loadingPay && <Loader />}
                                     {!sdkReady ? <Loader /> : (
-                                        <PayPalButton amount={order.totalPrice} onSuccess={succesPaymentHandler} />
+                                        <PayPalButton 
+                                            amount={order.totalPrice} 
+                                            onSuccess={succesPaymentHandler} 
+                                            createOrder={(data, actions) => {
+                                                return actions.order.create({
+                                                    purchase_units: [{
+                                                        amount: {
+                                                            currency_code: "USD",
+                                                            value: order.totalPrice
+                                                        }
+                                                    }]
+                                                })
+                                            }}
+                                        />
                                     )}
                                 </ListGroup.Item>
                             )}
